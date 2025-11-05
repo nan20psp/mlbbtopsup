@@ -293,9 +293,9 @@ def update_setting(key, value):
     except Exception as e:
         print(f"Failed to update setting '{key}': {e}")
 
-# --- Clone Bot DB Functions ---
+# --- Clone Bot DB Functions -
 
-def load_clone_bots(active_only=True): # <--- (၁) ဒီ function ကို အစားထိုးပါ
+def load_clone_bots(active_only=True): # <--- (၁) ပြင်ဆင်ပြီး
     """DB မှ clone bot အားလုံးကို dict အဖြစ် ယူပါ။"""
     if not client: return {}
     
@@ -308,12 +308,13 @@ def load_clone_bots(active_only=True): # <--- (၁) ဒီ function ကို �
         bots[str(bot["_id"])] = bot
     return bots
 
-def get_clone_bot(bot_id): # <--- (၂) ဒီ function အသစ် ထပ်ထည့်ပါ
+
+def get_clone_bot(bot_id): # <--- (၂) အသစ်ထပ်ထည့်
     """Bot ID တစ်ခုတည်းဖြင့် (status မခွဲဘဲ) ရှာပါ။"""
     if not client: return None
     return clone_bots_collection.find_one({"_id": str(bot_id)})
             
-def update_clone_bot_status(bot_id, status: str): # <--- (၃) ဒီ function အသစ် ထပ်ထည့်ပါ
+def update_clone_bot_status(bot_id, status: str): # <--- (၃) အသစ်ထပ်ထည့်
     """Bot ၏ status ကို (pending/active/rejected) ပြောင်းပါ။"""
     if not client: return
     clone_bots_collection.update_one(
@@ -324,8 +325,9 @@ def update_clone_bot_status(bot_id, status: str): # <--- (၃) ဒီ function �
 def save_clone_bot(bot_id, bot_data):
     """Clone bot data ကို DB မှာ သိမ်း/update လုပ်ပါ။"""
     if not client: return
+    # bot_id ကို _id အဖြစ် သုံးပါမယ်
     bot_data_with_id = bot_data.copy()
-    bot_data_with_id["_id"] = str(bot_id)
+    bot_data_with_id["_id"] = str(bot_id) # ID ကို string အဖြစ် သေချာသိမ်း
     clone_bots_collection.update_one(
         {"_id": str(bot_id)},
         {"$set": bot_data_with_id},
@@ -342,6 +344,7 @@ def get_clone_bot_by_admin(admin_id):
     """Admin ID ဖြင့် clone bot ကို ရှာပါ။"""
     if not client: return None
     return clone_bots_collection.find_one({"owner_id": str(admin_id)})
+    
 
 def update_clone_bot_balance(bot_id, amount_change):
     """Clone bot ၏ balance ကို တိုး/လျော့ ပါ။"""
@@ -376,19 +379,19 @@ def save_clone_bot(bot_id, bot_data):
 def remove_clone_bot(bot_id):
     """Clone bot ကို DB မှ ဖျက်ပါ။"""
     if not client: return False
-    result = clone_bots_collection.delete_one({"_id": bot_id})
+    result = clone_bots_collection.delete_one({"_id": str(bot_id)})
     return result.deleted_count > 0
 
 def get_clone_bot_by_admin(admin_id):
     """Admin ID ဖြင့် clone bot ကို ရှာပါ။"""
     if not client: return None
-    return clone_bots_collection.find_one({"owner_id": admin_id})
+    return clone_bots_collection.find_one({"owner_id": str(admin_id)})
 
 def update_clone_bot_balance(bot_id, amount_change):
     """Clone bot ၏ balance ကို တိုး/လျော့ ပါ။"""
     if not client: return
     clone_bots_collection.update_one(
-        {"_id": bot_id},
+        {"_id": str(bot_id)},
         {"$inc": {"balance": amount_change}}
     )
 
