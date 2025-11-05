@@ -356,11 +356,18 @@ def update_clone_bot_balance(bot_id, amount_change):
 
 #_________________________________________________________________________________________
 
-def load_clone_bots():
+# --- Clone Bot DB Functions ---
+
+def load_clone_bots(active_only=True): # <--- (၁) ဒီနေရာမှာ ပြင်ဆင်ဖို့ လိုပါတယ်
     """DB မှ clone bot အားလုံးကို dict အဖြစ် ယူပါ။"""
     if not client: return {}
+    
+    query = {}
+    if active_only:
+        query = {"status": "active"} # Active bot များကိုသာ ရွေးထုတ်ရန်
+        
     bots = {}
-    for bot in clone_bots_collection.find():
+    for bot in clone_bots_collection.find(query):
         bots[str(bot["_id"])] = bot
     return bots
 
